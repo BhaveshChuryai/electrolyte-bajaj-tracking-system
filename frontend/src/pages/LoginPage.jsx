@@ -1,82 +1,444 @@
 import { useState } from 'react'
 import {
-  Box, Card, CardContent, TextField,
-  Button, Typography, Alert
+  Box, Grid, TextField, Button, Typography,
+  Checkbox, FormControlLabel, Link, Alert,
+  InputAdornment, IconButton, Divider, Chip
 } from '@mui/material'
+import EmailIcon from '@mui/icons-material/Email'
+import LockIcon from '@mui/icons-material/Lock'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import AnalyticsIcon from '@mui/icons-material/Analytics'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
+import SecurityIcon from '@mui/icons-material/Security'
+import SpeedIcon from '@mui/icons-material/Speed'
+import PeopleIcon from '@mui/icons-material/People'
+import logo from '../assets/logo.jpeg'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [remember, setRemember] = useState(false)
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const validate = () => {
+    if (!email.includes('@')) return 'Enter a valid email address'
+    if (!password) return 'Password is required'
+    return ''
+  }
 
   const handleLogin = () => {
-    if (email === 'admin@bajaj.com' && password === 'admin123') {
-      window.location.href = '/dashboard'
-    } else {
-      setError('Invalid email or password!')
-    }
+    const err = validate()
+    if (err) return setError(err)
+    setError('')
+    setLoading(true)
+    setTimeout(() => {
+      if (email === 'admin@bajaj.com' && password === 'admin123') {
+        window.location.href = '/dashboard'
+      } else {
+        setError('Invalid credentials. Please try again.')
+        setLoading(false)
+      }
+    }, 1200)
   }
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') handleLogin()
+  }
+
+  const features = [
+    { icon: <AnalyticsIcon sx={{ color: '#00b4ff', fontSize: 26 }} />, title: 'Real-time Analytics', desc: 'Live PCB performance insights' },
+    { icon: <UploadFileIcon sx={{ color: '#00b4ff', fontSize: 26 }} />, title: 'Excel Processing', desc: 'Auto upload & data parsing' },
+    { icon: <DashboardIcon sx={{ color: '#00b4ff', fontSize: 26 }} />, title: 'Smart Dashboard', desc: 'KPIs, charts & filters' },
+    { icon: <SecurityIcon sx={{ color: '#00b4ff', fontSize: 26 }} />, title: 'Role Based Access', desc: 'Admin, Manager & Viewer' },
+    { icon: <SpeedIcon sx={{ color: '#00b4ff', fontSize: 26 }} />, title: 'High Performance', desc: 'API response under 1 second' },
+    { icon: <PeopleIcon sx={{ color: '#00b4ff', fontSize: 26 }} />, title: 'Multi User', desc: 'Supports 30+ concurrent users' },
+  ]
+
+  const stats = [
+    { value: '99.9%', label: 'Uptime' },
+    { value: '<1s', label: 'API Response' },
+    { value: '30+', label: 'Concurrent Users' },
+    { value: '95%', label: 'Data Accuracy' },
+  ]
 
   return (
     <Box sx={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #1565C0 0%, #0D47A1 100%)',
+      background: 'linear-gradient(160deg, #020617 0%, #0f172a 60%, #0a1628 100%)',
       display: 'flex',
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
+      position: 'relative',
+      overflow: 'hidden',
+      py: 3,
+      px: 2,
     }}>
-      <Card sx={{ width: 400, borderRadius: 3, boxShadow: 10 }}>
-        <CardContent sx={{ p: 4 }}>
 
-          <Typography variant="h5" fontWeight="bold" 
-            textAlign="center" color="#1565C0" mb={1}>
-            ⚡ Electrolyte Bajaj
-          </Typography>
-          <Typography variant="body2" 
-            textAlign="center" color="gray" mb={3}>
-            PCB Data Analysis Dashboard
-          </Typography>
+      {/* Grid pattern */}
+      <Box sx={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'linear-gradient(rgba(0,180,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,255,0.04) 1px, transparent 1px)',
+        backgroundSize: '60px 60px',
+        pointerEvents: 'none',
+      }} />
 
-          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {/* Glow top right */}
+      <Box sx={{
+        position: 'absolute', width: 600, height: 600,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(0,180,255,0.12), transparent)',
+        top: '-200px', right: '-200px',
+        animation: 'float 6s ease-in-out infinite',
+        '@keyframes float': {
+          '0%,100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        }
+      }} />
 
-          <TextField
-            fullWidth label="Email" type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+      {/* Glow bottom left */}
+      <Box sx={{
+        position: 'absolute', width: 400, height: 400,
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,200,0,0.05), transparent)',
+        bottom: '-150px', left: '-150px',
+      }} />
 
-          <TextField
-            fullWidth label="Password" type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            sx={{ mb: 3 }}
-          />
+      {/* Secure badge */}
+      <Box zIndex={1} mb={1.5}>
+        <Chip
+          label="🔒 Secure Internal Platform — Bajaj Auto Limited"
+          size="small"
+          sx={{
+            background: 'rgba(0,180,255,0.1)',
+            border: '1px solid rgba(0,180,255,0.2)',
+            color: 'rgba(255,255,255,0.6)',
+            fontSize: '0.75rem',
+            letterSpacing: 0.5,
+          }}
+        />
+      </Box>
 
-          <Button
-            fullWidth variant="contained"
-            size="large"
-            onClick={handleLogin}
+      {/* Main wide card */}
+      <Box zIndex={1} sx={{
+        width: '100%',
+        maxWidth: 900,
+        background: 'rgba(255,255,255,0.04)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 5,
+        backdropFilter: 'blur(20px)',
+        boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
+        overflow: 'hidden',
+        animation: 'slideIn 0.7s ease',
+        '@keyframes slideIn': {
+          from: { opacity: 0, transform: 'translateY(30px)' },
+          to: { opacity: 1, transform: 'translateY(0)' }
+        }
+      }}>
+
+        {/* Top branding */}
+        <Box sx={{
+          textAlign: 'center',
+          pt: 3, pb: 2, px: 4,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(0,0,0,0.2)',
+        }}>
+          <Box sx={{
+            display: 'inline-block', p: 1,
+            borderRadius: 3,
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            mb: 1.5,
+          }}>
+            <img src={logo} alt="logo"
+              style={{ width: 150, borderRadius: 8, display: 'block' }} />
+          </Box>
+
+          <Typography variant="h4" fontWeight="900"
             sx={{
-              background: 'linear-gradient(135deg, #1565C0, #0D47A1)',
-              borderRadius: 2,
-              py: 1.5,
-              fontWeight: 'bold',
-              fontSize: '1rem'
+              background: 'linear-gradient(135deg, #ffffff 30%, #00b4ff 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-1px', mb: 0.5,
             }}>
-            Login
+            Electrolyte Bajaj
+          </Typography>
+
+          <Typography sx={{
+            color: 'rgba(255,255,255,0.35)',
+            fontSize: '0.7rem', letterSpacing: 3,
+            textTransform: 'uppercase',
+          }}>
+            PCB Data Intelligence Platform
+          </Typography>
+        </Box>
+
+        {/* Feature cards */}
+        <Box sx={{ px: 4, pt: 2, pb: 2, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <Grid container spacing={1.5}>
+            {features.map((f, i) => (
+              <Grid item xs={6} sm={4} key={i}>
+                <Box sx={{
+                  p: 1.5, borderRadius: 3,
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  display: 'flex', gap: 1.5, alignItems: 'flex-start',
+                  transition: 'all 0.3s',
+                  '&:hover': {
+                    background: 'rgba(0,180,255,0.08)',
+                    border: '1px solid rgba(0,180,255,0.2)',
+                    transform: 'translateY(-3px)',
+                  }
+                }}>
+                  {f.icon}
+                  <Box>
+                    <Typography fontWeight="700" fontSize="0.78rem"
+                      sx={{ color: 'white', mb: 0.2 }}>
+                      {f.title}
+                    </Typography>
+                    <Typography fontSize="0.65rem"
+                      sx={{ color: 'rgba(255,255,255,0.35)' }}>
+                      {f.desc}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* Login form */}
+        <Box sx={{ px: { xs: 3, sm: 8 }, py: 3 }}>
+
+          <Typography variant="h5" fontWeight="800"
+            sx={{ color: 'white', mb: 0.5, textAlign: 'center' }}>
+            Welcome Back 👋
+          </Typography>
+          <Typography variant="body2" mb={3}
+            sx={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center' }}>
+            Sign in to access your dashboard
+          </Typography>
+
+          {error && (
+            <Alert severity="error" sx={{
+              mb: 2, borderRadius: 2,
+              background: 'rgba(255,50,50,0.1)',
+              border: '1px solid rgba(255,50,50,0.3)',
+              color: '#ff6b6b',
+              '& .MuiAlert-icon': { color: '#ff6b6b' }
+            }}>
+              {error}
+            </Alert>
+          )}
+
+          <Grid container spacing={2}>
+            {/* Email */}
+            <Grid item xs={12} sm={6}>
+              <Typography variant="caption"
+                sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: 0.5, display: 'block', mb: 0.5 }}>
+                EMAIL ADDRESS
+              </Typography>
+              <TextField
+                fullWidth type="email"
+                placeholder="admin@bajaj.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyPress={handleKeyPress}
+                sx={inputStyle}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }} />
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Grid>
+
+            {/* Password */}
+            <Grid item xs={12} sm={6}>
+              <Typography variant="caption"
+                sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 600, letterSpacing: 0.5, display: 'block', mb: 0.5 }}>
+                PASSWORD
+              </Typography>
+              <TextField
+                fullWidth
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyPress={handleKeyPress}
+                sx={inputStyle}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                        {showPassword
+                          ? <VisibilityOff sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }} />
+                          : <Visibility sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }} />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          {/* Remember + Forgot */}
+          <Box display="flex" justifyContent="space-between"
+            alignItems="center" mt={1.5} mb={2}>
+            <FormControlLabel
+              control={
+                <Checkbox checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  size="small"
+                  sx={{ color: 'rgba(255,255,255,0.3)', '&.Mui-checked': { color: '#00b4ff' } }}
+                />
+              }
+              label={
+                <Typography variant="body2"
+                  sx={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.82rem' }}>
+                  Remember me
+                </Typography>
+              }
+            />
+            <Link href="#" underline="hover"
+              sx={{ color: '#00b4ff', fontSize: '0.82rem', fontWeight: 500 }}>
+              Forgot password?
+            </Link>
+          </Box>
+
+          {/* Login Button */}
+          <Button fullWidth variant="contained"
+            size="large" onClick={handleLogin} disabled={loading}
+            sx={{
+              py: 1.5, borderRadius: 2,
+              fontWeight: 'bold', fontSize: '1rem',
+              background: loading
+                ? 'rgba(255,255,255,0.1)'
+                : 'linear-gradient(135deg, #00b4ff 0%, #0066ff 100%)',
+              boxShadow: loading ? 'none' : '0 8px 25px rgba(0,102,255,0.4)',
+              color: loading ? 'rgba(255,255,255,0.3)' : 'white',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 12px 35px rgba(0,102,255,0.5)',
+              },
+              '&:active': { transform: 'translateY(0px)' }
+            }}>
+            {loading ? '⏳ Signing in...' : 'Sign In →'}
           </Button>
 
-          <Typography variant="caption" 
-            display="block" textAlign="center" 
-            color="gray" mt={2}>
-            Use: admin@bajaj.com / admin123
-          </Typography>
+          {/* Demo credentials */}
+          <Divider sx={{ my: 2, borderColor: 'rgba(255,255,255,0.06)' }}>
+            <Typography variant="caption"
+              sx={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.65rem', letterSpacing: 1 }}>
+              DEMO ACCESS
+            </Typography>
+          </Divider>
 
-        </CardContent>
-      </Card>
+          <Box sx={{
+            p: 1.5, borderRadius: 2, textAlign: 'center',
+            background: 'rgba(0,180,255,0.05)',
+            border: '1px dashed rgba(0,180,255,0.15)',
+          }}>
+            <Typography variant="caption"
+              sx={{ color: 'rgba(255,255,255,0.35)' }} display="block">
+              📧 admin@bajaj.com &nbsp;·&nbsp; 🔑 admin123
+            </Typography>
+          </Box>
+        </Box>
+
+        {/* Stats bottom bar */}
+        <Box sx={{
+          px: 4, py: 2,
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(0,0,0,0.2)',
+          display: 'flex',
+          justifyContent: 'space-around',
+          flexWrap: 'wrap',
+          gap: 2,
+        }}>
+          {stats.map((s, i) => (
+            <Box key={i} textAlign="center">
+              <Typography fontWeight="800" fontSize="1rem"
+                sx={{
+                  background: 'linear-gradient(135deg, #00b4ff, #ffffff)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}>
+                {s.value}
+              </Typography>
+              <Typography variant="caption"
+                sx={{ color: 'rgba(255,255,255,0.3)', letterSpacing: 1, fontSize: '0.6rem' }}>
+                {s.label}
+              </Typography>
+            </Box>
+          ))}
+
+          {/* Live status */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <Box sx={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: '#00ff88',
+              boxShadow: '0 0 8px #00ff88',
+              animation: 'blink 2s infinite',
+              '@keyframes blink': {
+                '0%,100%': { opacity: 1 },
+                '50%': { opacity: 0.3 },
+              }
+            }} />
+            <Typography variant="caption"
+              sx={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.65rem' }}>
+              All systems operational
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Footer */}
+      <Box zIndex={1} mt={2} display="flex"
+        justifyContent="space-between" alignItems="center"
+        width="100%" maxWidth={900}>
+        <Typography variant="caption"
+          sx={{ color: 'rgba(255,255,255,0.2)' }}>
+          © 2025 Bajaj Auto Limited · Internal Tool
+        </Typography>
+        <Chip label="v1.0.0" size="small"
+          sx={{
+            background: 'rgba(255,255,255,0.05)',
+            color: 'rgba(255,255,255,0.25)',
+            fontSize: '0.65rem', height: 20,
+          }}
+        />
+      </Box>
+
     </Box>
   )
 }
 
+const inputStyle = {
+  '& .MuiOutlinedInput-root': {
+    color: 'white',
+    borderRadius: 2,
+    background: 'rgba(255,255,255,0.05)',
+    '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
+    '&:hover fieldset': { borderColor: 'rgba(0,180,255,0.4)' },
+    '&.Mui-focused fieldset': { borderColor: '#00b4ff', borderWidth: 2 },
+  },
+  '& input::placeholder': { color: 'rgba(255,255,255,0.2)', opacity: 1 },
+}
 export default LoginPage
+
+
+
+
