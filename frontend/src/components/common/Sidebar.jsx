@@ -1,62 +1,114 @@
-import { Box, Typography, List, ListItem, ListItemIcon, ListItemText } from '@mui/material'
+import { Box, Typography, List, ListItem, ListItemIcon, ListItemText, Divider, Chip } from '@mui/material'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import AnalyticsIcon from '@mui/icons-material/Analytics'
-import UploadFileIcon from '@mui/icons-material/UploadFile'
 import TableChartIcon from '@mui/icons-material/TableChart'
-import { useState } from 'react'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
+import SettingsIcon from '@mui/icons-material/Settings'
+import { useNavigate, useLocation } from 'react-router-dom'
+import logo from '../../assets/logo.jpeg'
+
+const menuItems = [
+  { label: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { label: 'Analytics', icon: <AnalyticsIcon />, path: '/analytics' },
+  { label: 'Master Table', icon: <TableChartIcon />, path: '/master-table' },
+  { label: 'Upload Data', icon: <UploadFileIcon />, path: '/upload' },
+]
+
+const bottomItems = [
+  { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+]
 
 function Sidebar() {
-  const [active, setActive] = useState('Dashboard')
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const menuItems = [
-    { label: 'Dashboard', icon: <DashboardIcon /> },
-    { label: 'Analytics', icon: <AnalyticsIcon /> },
-    { label: 'Upload Data', icon: <UploadFileIcon /> },
-    { label: 'Data Table', icon: <TableChartIcon /> },
-  ]
+  const isActive = (path) => location.pathname === path
 
   return (
     <Box sx={{
-      width: 220,
+      width: 240,
       minHeight: '100vh',
-      background: 'linear-gradient(180deg, #020617 0%, #0f172a 100%)',
+      background: 'linear-gradient(180deg, #0d1424 0%, #0f172a 100%)',
       borderRight: '1px solid rgba(255,255,255,0.06)',
-      pt: 3,
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'sticky',
+      top: 0,
+      height: '100vh',
     }}>
 
-      <Typography variant="caption" sx={{
-        color: 'rgba(255,255,255,0.25)',
-        letterSpacing: 2,
-        textTransform: 'uppercase',
-        px: 2.5,
-        mb: 1,
-        display: 'block'
+      {/* Logo section */}
+      <Box sx={{
+        p: 2.5,
+        borderBottom: '1px solid rgba(255,255,255,0.06)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1.5,
       }}>
-        Main Menu
-      </Typography>
+        <Box sx={{
+          p: 0.8, borderRadius: 2,
+          background: 'rgba(255,255,255,0.05)',
+          border: '1px solid rgba(255,255,255,0.1)',
+        }}>
+          <img src={logo} alt="logo"
+            style={{ width: 55, borderRadius: 6, display: 'block' }} />
+        </Box>
+        <Box>
+          <Typography fontWeight="800" fontSize="0.85rem"
+            sx={{
+              background: 'linear-gradient(135deg, #ffffff, #00b4ff)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+            Electrolyte
+          </Typography>
+          <Typography fontSize="0.62rem"
+            sx={{ color: 'rgba(255,255,255,0.3)', letterSpacing: 0.5 }}>
+            Bajaj Auto Limited
+          </Typography>
+        </Box>
+      </Box>
 
-      <List>
+      {/* Menu label */}
+      <Box sx={{ px: 2.5, pt: 2.5, pb: 1 }}>
+        <Typography variant="caption" sx={{
+          color: 'rgba(255,255,255,0.2)',
+          letterSpacing: 2,
+          textTransform: 'uppercase',
+          fontSize: '0.65rem',
+        }}>
+          Main Menu
+        </Typography>
+      </Box>
+
+      {/* Menu items */}
+      <List sx={{ px: 1.5, flexGrow: 1 }}>
         {menuItems.map((item) => (
           <ListItem
             key={item.label}
-            onClick={() => setActive(item.label)}
+            onClick={() => navigate(item.path)}
             sx={{
-              mb: 0.5, mx: 1, borderRadius: 2,
-              width: 'auto', cursor: 'pointer',
-              background: active === item.label
+              mb: 0.5, borderRadius: 2,
+              cursor: 'pointer',
+              background: isActive(item.path)
                 ? 'linear-gradient(135deg, rgba(0,180,255,0.15), rgba(0,102,255,0.1))'
                 : 'transparent',
-              border: active === item.label
-                ? '1px solid rgba(0,180,255,0.2)'
+              border: isActive(item.path)
+                ? '1px solid rgba(0,180,255,0.25)'
                 : '1px solid transparent',
+              transition: 'all 0.25s',
               '&:hover': {
-                background: 'rgba(0,180,255,0.08)',
+                background: isActive(item.path)
+                  ? 'linear-gradient(135deg, rgba(0,180,255,0.2), rgba(0,102,255,0.15))'
+                  : 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(0,180,255,0.15)',
+                transform: 'translateX(4px)',
               },
-              transition: 'all 0.3s',
             }}>
             <ListItemIcon sx={{
-              color: active === item.label ? '#00b4ff' : 'rgba(255,255,255,0.35)',
-              minWidth: 36,
+              color: isActive(item.path) ? '#00b4ff' : 'rgba(255,255,255,0.3)',
+              minWidth: 38,
+              transition: 'all 0.25s',
             }}>
               {item.icon}
             </ListItemIcon>
@@ -64,26 +116,86 @@ function Sidebar() {
               primary={item.label}
               primaryTypographyProps={{
                 fontSize: '0.85rem',
-                fontWeight: active === item.label ? 700 : 400,
-                color: active === item.label ? 'white' : 'rgba(255,255,255,0.4)',
+                fontWeight: isActive(item.path) ? 700 : 400,
+                color: isActive(item.path) ? 'white' : 'rgba(255,255,255,0.45)',
+              }}
+            />
+            {isActive(item.path) && (
+              <Box sx={{
+                width: 4, height: 4, borderRadius: '50%',
+                background: '#00b4ff',
+                boxShadow: '0 0 6px #00b4ff',
+              }} />
+            )}
+          </ListItem>
+        ))}
+      </List>
+
+      {/* Divider */}
+      <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mx: 2 }} />
+
+      {/* Bottom items */}
+      <List sx={{ px: 1.5, py: 1 }}>
+        {bottomItems.map((item) => (
+          <ListItem
+            key={item.label}
+            onClick={() => navigate(item.path)}
+            sx={{
+              borderRadius: 2, cursor: 'pointer',
+              '&:hover': {
+                background: 'rgba(255,255,255,0.04)',
+              },
+            }}>
+            <ListItemIcon sx={{
+              color: 'rgba(255,255,255,0.3)', minWidth: 38
+            }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText
+              primary={item.label}
+              primaryTypographyProps={{
+                fontSize: '0.85rem',
+                color: 'rgba(255,255,255,0.4)',
               }}
             />
           </ListItem>
         ))}
       </List>
 
-      {/* Bottom info */}
+      {/* Bottom user info */}
       <Box sx={{
-        position: 'absolute', bottom: 20,
-        px: 2.5,
+        p: 2,
+        borderTop: '1px solid rgba(255,255,255,0.06)',
+        background: 'rgba(0,0,0,0.2)',
       }}>
+        {/* Status */}
+        <Box display="flex" alignItems="center"
+          justifyContent="space-between" mb={1}>
+          <Chip
+            label="● Online"
+            size="small"
+            sx={{
+              background: 'rgba(0,255,136,0.1)',
+              border: '1px solid rgba(0,255,136,0.2)',
+              color: '#00ff88',
+              fontSize: '0.65rem',
+              height: 20,
+            }}
+          />
+          <Typography variant="caption"
+            sx={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.62rem' }}>
+            v1.0.0
+          </Typography>
+        </Box>
         <Typography variant="caption"
-          sx={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.65rem' }}>
+          sx={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.62rem', display: 'block' }}>
           © 2025 Bajaj Auto Limited
         </Typography>
       </Box>
+
     </Box>
   )
 }
 
 export default Sidebar
+

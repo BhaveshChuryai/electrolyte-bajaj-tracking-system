@@ -1,38 +1,44 @@
 import {
   Box, Typography, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Chip, TextField,
-  InputAdornment
+  TableContainer, TableHead, TableRow, Chip,
+  TablePagination, IconButton, Tooltip
 } from '@mui/material'
-import SearchIcon from '@mui/icons-material/Search'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import FileDownloadIcon from '@mui/icons-material/FileDownload'
 import { useState } from 'react'
 
-const rows = [
-  { id: 1, sparePart: 'SP001', component: 'Resistor', status: 'Active', count: 320, total: 1200 },
-  { id: 2, sparePart: 'SP002', component: 'Capacitor', status: 'Pending', count: 150, total: 800 },
-  { id: 3, sparePart: 'SP003', component: 'Transistor', status: 'Approved', count: 480, total: 2100 },
-  { id: 4, sparePart: 'SP004', component: 'Diode', status: 'Inactive', count: 90, total: 450 },
-  { id: 5, sparePart: 'SP005', component: 'IC Chip', status: 'Active', count: 560, total: 3200 },
-  { id: 6, sparePart: 'SP006', component: 'Relay', status: 'Review', count: 210, total: 950 },
-  { id: 7, sparePart: 'SP007', component: 'Fuse', status: 'Approved', count: 340, total: 1800 },
-  { id: 8, sparePart: 'SP008', component: 'Transformer', status: 'Pending', count: 75, total: 600 },
-]
-
 const statusColors = {
-  Active: '#00ff88',
-  Pending: '#ff9500',
-  Approved: '#00b4ff',
-  Inactive: '#ff4444',
-  Review: '#bf5af2',
+  Active: { bg: 'rgba(0,255,136,0.1)', border: 'rgba(0,255,136,0.3)', color: '#00ff88' },
+  Pending: { bg: 'rgba(255,149,0,0.1)', border: 'rgba(255,149,0,0.3)', color: '#ff9500' },
+  Approved: { bg: 'rgba(0,180,255,0.1)', border: 'rgba(0,180,255,0.3)', color: '#00b4ff' },
+  Inactive: { bg: 'rgba(255,68,68,0.1)', border: 'rgba(255,68,68,0.3)', color: '#ff4444' },
+  Review: { bg: 'rgba(191,90,242,0.1)', border: 'rgba(191,90,242,0.3)', color: '#bf5af2' },
 }
 
-function DataTable() {
-  const [search, setSearch] = useState('')
+const headers = ['#', 'Spare Part', 'Component', 'Status', 'Count', 'Total', 'Action']
 
-  const filtered = rows.filter(r =>
-    r.component.toLowerCase().includes(search.toLowerCase()) ||
-    r.sparePart.toLowerCase().includes(search.toLowerCase()) ||
-    r.status.toLowerCase().includes(search.toLowerCase())
+function DataTable({ rows = [], search, onSearchChange }) {
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
+
+  // Pagination
+  const paginatedRows = rows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
   )
+
+  const handleExport = () => {
+    const csv = [
+      headers.slice(0, -1).join(','),
+      ...rows.map(r => `${r.id},${r.sparePart},${r.component},${r.status},${r.count},${r.total}`)
+    ].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'pcb_data.csv'
+    a.click()
+  }
 
   return (
     <Box sx={{
@@ -44,7 +50,7 @@ function DataTable() {
 
       {/* Header */}
       <Box display="flex" justifyContent="space-between"
-        alignItems="center" mb={2}>
+        alignItems="center" mb={2.5}>
         <Box>
           <Typography fontWeight="700" fontSize="0.95rem"
             sx={{ color: 'white' }}>
@@ -52,98 +58,159 @@ function DataTable() {
           </Typography>
           <Typography fontSize="0.72rem"
             sx={{ color: 'rgba(255,255,255,0.35)' }}>
-            {filtered.length} records found
+            {rows.length} records found
           </Typography>
         </Box>
 
-        {/* Search */}
-        <TextField
-          size="small"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          sx={{
-            width: 200,
-            '& .MuiOutlinedInput-root': {
-              color: 'white',
+        {/* Export button */}
+        <Tooltip title="Export as CSV">
+          <IconButton onClick={handleExport}
+            sx={{
+              color: 'rgba(255,255,255,0.4)',
+              border: '1px solid rgba(255,255,255,0.08)',
               borderRadius: 2,
-              background: 'rgba(255,255,255,0.05)',
-              '& fieldset': { borderColor: 'rgba(255,255,255,0.1)' },
-              '&:hover fieldset': { borderColor: '#00b4ff' },
-              '&.Mui-focused fieldset': { borderColor: '#00b4ff' },
-            },
-            '& input::placeholder': { color: 'rgba(255,255,255,0.3)', opacity: 1 },
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: 'rgba(255,255,255,0.3)', fontSize: 18 }} />
-              </InputAdornment>
-            )
-          }}
-        />
+              '&:hover': {
+                color: '#00ff88',
+                border: '1px solid rgba(0,255,136,0.3)',
+                background: 'rgba(0,255,136,0.05)',
+              }
+            }}>
+            <FileDownloadIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
       </Box>
 
+      {/* Empty state */}
+      {rows.length === 0 && (
+        <Box textAlign="center" py={6}>
+          <Typography fontSize="2rem" mb={1}>🔍</Typography>
+          <Typography fontWeight="600"
+            sx={{ color: 'rgba(255,255,255,0.4)' }}>
+            No records found
+          </Typography>
+          <Typography fontSize="0.8rem"
+            sx={{ color: 'rgba(255,255,255,0.2)' }}>
+            Try adjusting your filters
+          </Typography>
+        </Box>
+      )}
+
       {/* Table */}
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {['#', 'Spare Part', 'Component', 'Status', 'Count', 'Total'].map((h) => (
-                <TableCell key={h} sx={{
-                  color: 'rgba(255,255,255,0.4)',
-                  borderBottom: '1px solid rgba(255,255,255,0.06)',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  letterSpacing: 1,
-                  textTransform: 'uppercase',
+      {rows.length > 0 && (
+        <>
+          <TableContainer sx={{
+            borderRadius: 2,
+            border: '1px solid rgba(255,255,255,0.05)',
+          }}>
+            <Table>
+              <TableHead>
+                <TableRow sx={{
+                  background: 'rgba(0,0,0,0.2)',
                 }}>
-                  {h}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filtered.map((row) => (
-              <TableRow key={row.id} sx={{
-                '&:hover': { background: 'rgba(0,180,255,0.04)' },
-                transition: 'all 0.2s',
-              }}>
-                <TableCell sx={{ color: 'rgba(255,255,255,0.3)', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.82rem' }}>
-                  {row.id}
-                </TableCell>
-                <TableCell sx={{ color: 'white', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.82rem', fontWeight: 600 }}>
-                  {row.sparePart}
-                </TableCell>
-                <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.82rem' }}>
-                  {row.component}
-                </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <Chip
-                    label={row.status}
-                    size="small"
-                    sx={{
-                      background: `${statusColors[row.status]}15`,
-                      border: `1px solid ${statusColors[row.status]}40`,
-                      color: statusColors[row.status],
-                      fontSize: '0.7rem',
+                  {headers.map((h) => (
+                    <TableCell key={h} sx={{
+                      color: 'rgba(255,255,255,0.35)',
+                      borderBottom: '1px solid rgba(255,255,255,0.06)',
+                      fontSize: '0.72rem',
                       fontWeight: 700,
-                    }}
-                  />
-                </TableCell>
-                <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.82rem' }}>
-                  {row.count}
-                </TableCell>
-                <TableCell sx={{ color: '#00b4ff', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: '0.82rem', fontWeight: 600 }}>
-                  {row.total}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                      letterSpacing: 1.5,
+                      textTransform: 'uppercase',
+                      py: 1.5,
+                    }}>
+                      {h}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {paginatedRows.map((row, i) => (
+                  <TableRow key={row.id} sx={{
+                    '&:hover': {
+                      background: 'rgba(0,180,255,0.04)',
+                    },
+                    transition: 'background 0.2s',
+                    background: i % 2 === 0
+                      ? 'transparent'
+                      : 'rgba(255,255,255,0.01)',
+                  }}>
+                    <TableCell sx={cellStyle}>
+                      {page * rowsPerPage + i + 1}
+                    </TableCell>
+                    <TableCell sx={{ ...cellStyle, color: 'white', fontWeight: 600 }}>
+                      {row.sparePart}
+                    </TableCell>
+                    <TableCell sx={cellStyle}>
+                      {row.component}
+                    </TableCell>
+                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.04)', py: 1.5 }}>
+                      <Chip
+                        label={row.status}
+                        size="small"
+                        sx={{
+                          background: statusColors[row.status]?.bg,
+                          border: `1px solid ${statusColors[row.status]?.border}`,
+                          color: statusColors[row.status]?.color,
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          height: 22,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell sx={cellStyle}>
+                      {row.count.toLocaleString()}
+                    </TableCell>
+                    <TableCell sx={{ ...cellStyle, color: '#00b4ff', fontWeight: 600 }}>
+                      {row.total.toLocaleString()}
+                    </TableCell>
+                    <TableCell sx={{ borderBottom: '1px solid rgba(255,255,255,0.04)', py: 1.5 }}>
+                      <Tooltip title="View Details">
+                        <IconButton size="small"
+                          sx={{
+                            color: 'rgba(255,255,255,0.3)',
+                            '&:hover': { color: '#00b4ff' }
+                          }}>
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {/* Pagination */}
+          <TablePagination
+            component="div"
+            count={rows.length}
+            page={page}
+            onPageChange={(e, newPage) => setPage(newPage)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10))
+              setPage(0)
+            }}
+            rowsPerPageOptions={[5, 10, 25]}
+            sx={{
+              color: 'rgba(255,255,255,0.4)',
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+              mt: 1,
+              '& .MuiIconButton-root': { color: 'rgba(255,255,255,0.4)' },
+              '& .MuiSelect-icon': { color: 'rgba(255,255,255,0.4)' },
+              '& .MuiTablePagination-select': { color: 'rgba(255,255,255,0.6)' },
+            }}
+          />
+        </>
+      )}
     </Box>
   )
+}
+
+const cellStyle = {
+  color: 'rgba(255,255,255,0.65)',
+  borderBottom: '1px solid rgba(255,255,255,0.04)',
+  fontSize: '0.82rem',
+  py: 1.5,
 }
 
 export default DataTable
